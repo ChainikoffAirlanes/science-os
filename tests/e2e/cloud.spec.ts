@@ -920,6 +920,7 @@ test.describe.serial("Live Supabase research lifecycle", () => {
     await page
       .getByRole("button", { name: "Подтвердить", exact: true })
       .click();
+    await expect(page.getByRole("dialog")).not.toBeVisible();
     await expect(card).toHaveCount(0);
     expect(
       (

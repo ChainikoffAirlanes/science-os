@@ -2,6 +2,8 @@
 
 Русскоязычное исследовательское пространство для учеников, преподавателей и команд. React, TypeScript, Vite, Supabase, GitHub Pages. Без искусственного интеллекта и платных API.
 
+[Открыть сайт](https://chainikoffairlanes.github.io/science-os/) · [Отчёт о выпуске](RELEASE_REPORT.md)
+
 ## Запуск
 
 Требуется Node.js 24 LTS. Установите зависимости: `npm ci`. Скопируйте `.env.example` в `.env.local` и укажите URL Supabase и **клиентский publishable key**. Выполните `npm run dev`.

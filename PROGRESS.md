@@ -1,36 +1,42 @@
-# Science OS — delivery progress
+# Science OS — progress
 
-Updated 2026-11-20. Status: implementation complete; hosted browser verification and production release in progress.
+Updated 2026-11-20. Status: **Deployed with Known Limitations**. The goal remains active for the owner handoffs below.
 
-| Module | Implementation | Observed verification |
+## Delivered and verified
+
+| Module | Implementation | Evidence |
 |---|---|---|
-| React/TypeScript, hash routing, Russian design system | Implemented | Typecheck, lint and production build pass |
-| Database, RLS, versioned RPC, private Storage | Implemented, six migrations applied | 19/19 public tables have RLS; PostgreSQL authorization tests pass |
-| Immediate registration, login, profile, avatar | Implemented | Real Supabase signup/login pass; avatar browser check pending latest regression |
-| Dashboard, project CRUD/copy/archive, scientific sections | Implemented | Hosted creation/reload and duplication tested; latest regression in progress |
-| Typed observations, custom parameters, keyboard editor | Implemented | Hosted cell persistence and conflict tests; unit validation passes |
-| Invitations, roles, Realtime, Presence | Implemented | Genuine separate-account hosted tests; latest regression in progress |
-| Tasks, comments, history, notifications | Implemented | Hosted task/comment/report scenario passed; latest regression in progress |
-| Charts, comparison, statistics, image exports | Implemented | CSV/XLSX/chart scenario passed in prior hosted run; regression in progress |
-| CSV/XLSX and private files | Implemented | Genuine hosted byte-for-byte roundtrip and unauthorized download checks passed |
-| A4 Cyrillic PDF and print | Implemented | Actual PDF generated, extracted and rendered; final visual inspection pending |
-| Selective publications and teacher opportunities | Implemented | Prior hosted scenarios passed; latest regression pending |
-| Admin role search and verified grant operation | Implemented, migration applied | PostgreSQL restriction/last-admin tests pass; owner account bootstrap pending |
-| Responsive layout | Implemented | Public seven widths pass; authenticated seven widths being rechecked |
-| GitHub/Actions/Pages | Configured | Repository exists, workflow-based Pages enabled; source push and deploy pending |
+| Russian React/TypeScript workspace and routing | Implemented | Typecheck, lint, build and public-route refresh pass locally/CI/Pages |
+| Supabase database, RLS and versioned RPC | Applied, six migrations | 19/19 public tables protected; 14 PostgreSQL integration tests pass |
+| Immediate registration, sessions, profile and avatar | Implemented | Genuine production signup/login and avatar scenario pass |
+| Projects, scientific sections, duplication and CRUD | Implemented | Hosted creation, reload, copy and metadata/delete checks pass |
+| Typed experiments, parameters and cell editor | Implemented | Hosted persistence, keyboard editing, conflict and unsaved-route guard pass |
+| CSV/XLSX import/export | Implemented | Actual workbook/CSV operations, preview, row counts and SQL atomicity pass |
+| Four chart types, comparisons and statistics | Implemented | Real two-series comparison, saved configuration and PNG/SVG/PDF exports pass |
+| Invitations, roles, Realtime and Presence | Implemented | Genuine independent accounts, WebSocket synchronization, deletion and viewer denial pass |
+| Tasks, comments, history and notifications | Implemented | Hosted task/comment lifecycle and concurrent-draft protection pass |
+| Private files and folders | Implemented | PDF/XLSX byte-for-byte hosted roundtrip; anonymous/outsider denial pass |
+| Reports, A4 PDF and Cyrillic | Implemented | Real four-page PDF from Pages rendered and inspected |
+| Selective publications and opportunities | Implemented | Anonymous safe snapshot, teacher opportunity, student application and acceptance pass |
+| Admin search and role grants | Implemented, applied | PostgreSQL last-admin/permission tests and hosted non-admin denial pass; first owner bootstrap pending |
+| Responsive UI | Implemented | Seven widths, public screens and eight authenticated routes pass; screenshots inspected |
+| GitHub Actions / Pages | Live | Source 68769c7, successful CI/deployment, public assets HTTP 200 |
+
+## Production evidence
+- Website: https://chainikoffairlanes.github.io/science-os/
+- Repository: https://github.com/ChainikoffAirlanes/science-os
+- Successful CI: https://github.com/ChainikoffAirlanes/science-os/actions/runs/44751079191
+- Successful deployment: https://github.com/ChainikoffAirlanes/science-os/actions/runs/44751079196
+- `npm test`: 15 unit + 14 genuine PostgreSQL PGlite integration tests, 29 passed.
+- Production Playwright: 24 passed, zero failed/skipped, 229 seconds. No API mocks. Actual Supabase Auth, REST, Storage and WebSockets.
+- CI deliberately runs eight public-browser tests and skips sixteen hosted tests without disposable credentials. It does not claim hosted coverage.
+- `npm audit --omit=dev`: zero vulnerabilities.
+- Summary: docs/VERIFICATION.json. Full scope, test boundaries and operational limits: RELEASE_REPORT.md.
 
 ## Owner-approved authentication change
-The owner explicitly chose immediate email/password registration without email confirmation: “Да, регистрация сразу без письма”. Supabase Confirm email is disabled. Email ownership is unverified. Email recovery is unavailable until SMTP is configured, and the UI explains this. Password change while signed in remains supported. This supersedes original email verification and email recovery requirements.
+The owner chose immediate email/password registration without email confirmation: “Да, регистрация сразу без письма”. Confirm email is disabled. Email ownership is unverified. Email recovery is unavailable until SMTP is configured; the UI explains this. Signed-in password changes remain supported. This supersedes the initial email verification/recovery requirements.
 
-## Verification boundaries
-- `npm test`: 29 passed, including real PostgreSQL RLS/RPC execution in PGlite with Supabase infrastructure stubs.
-- Hosted Playwright uses genuine Supabase Auth, PostgREST, Storage and WebSockets with three disposable test identities. No API mocks. Current complete result is recorded after the run finishes.
-- CI deliberately skips hosted scenarios without disposable credentials and runs eight public-browser tests. Local credentials and traces are ignored and never published.
-- Latest typecheck, lint and production build pass. Large lazy chart/workbook bundles produce a build warning; the build succeeds.
-- Do not confuse a configured Pages URL with a verified live deployment.
+## Cleanup and remaining handoff
+Test projects, opportunities, publications, private files and avatars have been cleared and verified absent for the dedicated QA identity. Twelve exact disposable Auth identities remain. Guarded SQL is prepared in ignored .tools/; deletion awaits owner permission. No real user's account is selected.
 
-## Data integrity fixes found during execution
-Stable cell editors preserve input across rerenders. Each edit captures a base version; stale cell, narrative and task writes present a conflict instead of overwriting. Accepting a server narrative refreshes the visible cache. Import and export fetch committed data. Private deletion events contain metadata only. Removing members clears assignments transactionally. Role grants are restricted to administrators and cannot demote the last administrator.
-
-## Remaining release work
-Finish latest hosted regression, inspect PDF/responsive images, publish reviewed source, wait for successful Actions, run the same real lifecycle against Pages, bootstrap the confirmed owner account, remove disposable QA identities and data, and write the final release report with exact evidence and limits.
+The owner has been asked to register their own app account and confirm its email for first-administrator bootstrap. This requires no password disclosure. The active goal is not marked complete while these handoffs remain.

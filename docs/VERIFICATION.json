@@ -1,0 +1,142 @@
+{
+  "verified_commit": "68769c7",
+  "production_url": "https://chainikoffairlanes.github.io/science-os/",
+  "started_utc": "2026-11-20T14:13:49.252Z",
+  "duration_ms": 229096.986,
+  "production_e2e": {
+    "passed": 24,
+    "failed": 0,
+    "skipped": 0,
+    "mocks": false,
+    "scenarios": [
+      {
+        "scenario": "Registration creates a real student account and signs in without email",
+        "status": "expected",
+        "duration_ms": 4565
+      },
+      {
+        "scenario": "A–C: real login, project creation, typed measurements and persistence",
+        "status": "expected",
+        "duration_ms": 14977
+      },
+      {
+        "scenario": "E–F: invitation, two-user realtime, conflict and viewer enforcement",
+        "status": "expected",
+        "duration_ms": 20732
+      },
+      {
+        "scenario": "D: CSV import preview, all charts, saved chart, exports and statistics",
+        "status": "expected",
+        "duration_ms": 27387
+      },
+      {
+        "scenario": "G–H: private file roundtrip, tasks, report PDF and Cyrillic",
+        "status": "expected",
+        "duration_ms": 21232
+      },
+      {
+        "scenario": "Narrative blocks and task drafts reject stale concurrent edits",
+        "status": "expected",
+        "duration_ms": 12152
+      },
+      {
+        "scenario": "I–J: selective public snapshot and teacher/student applications",
+        "status": "expected",
+        "duration_ms": 15322
+      },
+      {
+        "scenario": "Unsaved edits, project copy, experiment metadata and deletion work end to end",
+        "status": "expected",
+        "duration_ms": 12744
+      },
+      {
+        "scenario": "Profile avatar, dark theme and sidebar collapse preserve real settings",
+        "status": "expected",
+        "duration_ms": 5834
+      },
+      {
+        "scenario": "Responsive research workspace 360px",
+        "status": "expected",
+        "duration_ms": 10130
+      },
+      {
+        "scenario": "Responsive research workspace 375px",
+        "status": "expected",
+        "duration_ms": 10645
+      },
+      {
+        "scenario": "Responsive research workspace 390px",
+        "status": "expected",
+        "duration_ms": 10691
+      },
+      {
+        "scenario": "Responsive research workspace 768px",
+        "status": "expected",
+        "duration_ms": 11253
+      },
+      {
+        "scenario": "Responsive research workspace 1024px",
+        "status": "expected",
+        "duration_ms": 11117
+      },
+      {
+        "scenario": "Responsive research workspace 1440px",
+        "status": "expected",
+        "duration_ms": 11212
+      },
+      {
+        "scenario": "Responsive research workspace 1920px",
+        "status": "expected",
+        "duration_ms": 11014
+      },
+      {
+        "scenario": "Login, registration and recovery have real form validation and protected routes",
+        "status": "expected",
+        "duration_ms": 1310
+      },
+      {
+        "scenario": "Public responsive 360px",
+        "status": "expected",
+        "duration_ms": 1124
+      },
+      {
+        "scenario": "Public responsive 375px",
+        "status": "expected",
+        "duration_ms": 1110
+      },
+      {
+        "scenario": "Public responsive 390px",
+        "status": "expected",
+        "duration_ms": 1126
+      },
+      {
+        "scenario": "Public responsive 768px",
+        "status": "expected",
+        "duration_ms": 1132
+      },
+      {
+        "scenario": "Public responsive 1024px",
+        "status": "expected",
+        "duration_ms": 1150
+      },
+      {
+        "scenario": "Public responsive 1440px",
+        "status": "expected",
+        "duration_ms": 1178
+      },
+      {
+        "scenario": "Public responsive 1920px",
+        "status": "expected",
+        "duration_ms": 1199
+      }
+    ]
+  },
+  "local_and_ci": {
+    "unit_passed": 15,
+    "postgresql_integration_passed": 14,
+    "public_ci_e2e_passed": 8,
+    "hosted_scenarios_skipped_in_ci_without_credentials": 16
+  },
+  "ci": "https://github.com/ChainikoffAirlanes/science-os/actions/runs/44751079191",
+  "deployment": "https://github.com/ChainikoffAirlanes/science-os/actions/runs/44751079196"
+}
