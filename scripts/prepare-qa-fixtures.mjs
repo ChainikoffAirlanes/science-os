@@ -1,0 +1,11 @@
+// Run locally only. Never commit the generated .tools/ credentials or SQL.
+import { randomUUID } from 'node:crypto'
+import { mkdir, writeFile } from 'node:fs/promises'
+const accounts=['owner','editor','viewer'].map(role=>({role,id:randomUUID(),email:`science-os-qa-${role}-${Date.now()}@example.com`,password:randomUUID()+'Aa9!'}))
+await mkdir('.tools',{recursive:true})
+await writeFile('.tools/test-accounts.json',JSON.stringify(accounts))
+const quote=s=>"'"+s.replaceAll("'","''")+"'"
+const sql=`-- Disposable Science OS QA Auth fixtures. No real person's account is modified.\nbegin;\ncreate extension if not exists pgcrypto with schema extensions;\n`+accounts.map(a=>`insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at,confirmation_token,email_change,email_change_token_new,recovery_token) values ('00000000-0000-0000-0000-000000000000',${quote(a.id)},'authenticated','authenticated',${quote(a.email)},extensions.crypt(${quote(a.password)},extensions.gen_salt('bf')),now(),'{"provider":"email","providers":["email"]}','{"first_name":"QA","last_name":"${a.role}"}',now(),now(),'','','','');\ninsert into auth.identities(id,provider_id,user_id,identity_data,provider,created_at,updated_at) values(gen_random_uuid(),${quote(a.id)},${quote(a.id)},jsonb_build_object('sub',${quote(a.id)},'email',${quote(a.email)}),'email',now(),now());`).join('\n')+`\nupdate public.user_roles set role='teacher' where user_id=${quote(accounts[0].id)};\ncommit;\nselect id,display_name from public.profiles where id in (${accounts.map(a=>quote(a.id)).join(',')});`
+const encoded=sql.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+await writeFile('.tools/qa-fixtures.html',`<!doctype html><html lang="ru"><meta charset="utf-8"><title>Science OS — изолированные QA-аккаунты</title><h1>Одноразовые QA-аккаунты</h1><p>Три отдельных пользователя Supabase Auth для сценариев совместной работы. Существующие аккаунты и данные не изменяются. Пароли доступны только локальному тестовому процессу и не публикуются.</p><textarea aria-label="QA SQL" style="width:95%;height:75vh" readonly>${encoded}</textarea></html>`)
+console.log('Prepared three disposable QA identities; credentials remain in ignored .tools/.')
