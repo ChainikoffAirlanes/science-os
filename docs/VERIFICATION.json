@@ -1,5 +1,5 @@
 {
-  "verified_commit": "68769c7",
+  "verified_commit": "37e284e",
   "production_url": "https://chainikoffairlanes.github.io/science-os/",
   "started_utc": "2026-11-20T14:13:49.252Z",
   "duration_ms": 229096.986,
@@ -135,8 +135,141 @@
     "unit_passed": 15,
     "postgresql_integration_passed": 14,
     "public_ci_e2e_passed": 8,
-    "hosted_scenarios_skipped_in_ci_without_credentials": 16
+    "hosted_scenarios_skipped_in_ci_without_credentials": 17
   },
-  "ci": "https://github.com/ChainikoffAirlanes/science-os/actions/runs/44751079191",
-  "deployment": "https://github.com/ChainikoffAirlanes/science-os/actions/runs/44751079196"
+  "ci": "https://github.com/ChainikoffAirlanes/science-os/actions/runs/44754115600",
+  "deployment": "https://github.com/ChainikoffAirlanes/science-os/actions/runs/44754115688",
+  "baseline_verified_commit": "68769c7",
+  "latest_production_regression": {
+    "passed": 24,
+    "failed": 0,
+    "skipped": 0,
+    "duration_ms": 237684.961,
+    "started_utc": "2026-11-20T14:31:55.270Z",
+    "mocks": false,
+    "command": "E2E_BASE_URL=https://chainikoffairlanes.github.io/science-os/ npm run test:e2e -- --grep-invert 'Registration creates a real student account'",
+    "note": "Reuses existing QA accounts; signup was verified in the baseline run. Adds genuine delayed-read cancellation and save-lifetime checks without mocking responses.",
+    "scenarios": [
+      {
+        "scenario": "A–C: real login, project creation, typed measurements and persistence",
+        "status": "expected",
+        "duration_ms": 15712
+      },
+      {
+        "scenario": "E–F: invitation, two-user realtime, conflict and viewer enforcement",
+        "status": "expected",
+        "duration_ms": 19556
+      },
+      {
+        "scenario": "D: CSV import preview, all charts, saved chart, exports and statistics",
+        "status": "expected",
+        "duration_ms": 16793
+      },
+      {
+        "scenario": "G–H: private file roundtrip, tasks, report PDF and Cyrillic",
+        "status": "expected",
+        "duration_ms": 24059
+      },
+      {
+        "scenario": "Narrative blocks and task drafts reject stale concurrent edits",
+        "status": "expected",
+        "duration_ms": 11338
+      },
+      {
+        "scenario": "I–J: selective public snapshot and teacher/student applications",
+        "status": "expected",
+        "duration_ms": 15461
+      },
+      {
+        "scenario": "Unsaved edits, project copy, experiment metadata and deletion work end to end",
+        "status": "expected",
+        "duration_ms": 12109
+      },
+      {
+        "scenario": "Profile avatar, dark theme and sidebar collapse preserve real settings",
+        "status": "expected",
+        "duration_ms": 5834
+      },
+      {
+        "scenario": "Responsive research workspace 360px",
+        "status": "expected",
+        "duration_ms": 10493
+      },
+      {
+        "scenario": "Responsive research workspace 375px",
+        "status": "expected",
+        "duration_ms": 10990
+      },
+      {
+        "scenario": "Responsive research workspace 390px",
+        "status": "expected",
+        "duration_ms": 13559
+      },
+      {
+        "scenario": "Responsive research workspace 768px",
+        "status": "expected",
+        "duration_ms": 12293
+      },
+      {
+        "scenario": "Responsive research workspace 1024px",
+        "status": "expected",
+        "duration_ms": 11088
+      },
+      {
+        "scenario": "Responsive research workspace 1440px",
+        "status": "expected",
+        "duration_ms": 14679
+      },
+      {
+        "scenario": "Responsive research workspace 1920px",
+        "status": "expected",
+        "duration_ms": 17792
+      },
+      {
+        "scenario": "Login, registration and recovery have real form validation and protected routes",
+        "status": "expected",
+        "duration_ms": 1342
+      },
+      {
+        "scenario": "Public responsive 360px",
+        "status": "expected",
+        "duration_ms": 1127
+      },
+      {
+        "scenario": "Public responsive 375px",
+        "status": "expected",
+        "duration_ms": 1110
+      },
+      {
+        "scenario": "Public responsive 390px",
+        "status": "expected",
+        "duration_ms": 1126
+      },
+      {
+        "scenario": "Public responsive 768px",
+        "status": "expected",
+        "duration_ms": 1148
+      },
+      {
+        "scenario": "Public responsive 1024px",
+        "status": "expected",
+        "duration_ms": 1167
+      },
+      {
+        "scenario": "Public responsive 1440px",
+        "status": "expected",
+        "duration_ms": 1198
+      },
+      {
+        "scenario": "Public responsive 1920px",
+        "status": "expected",
+        "duration_ms": 1216
+      },
+      {
+        "scenario": "Search settles, navigation aborts stale reads, and an in-flight save survives",
+        "status": "expected",
+        "duration_ms": 6532
+      }
+    ]
+  }
 }
