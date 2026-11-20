@@ -1,6 +1,6 @@
 # Science OS — progress
 
-Updated 2026-11-20. Status: **Deployed with Known Limitations**. The goal remains active for the owner handoffs below.
+Updated 2026-11-20. Status: **Deployed with Known Limitations**. Implementation, production verification and owner handoff are complete.
 
 ## Delivered and verified
 
@@ -18,7 +18,7 @@ Updated 2026-11-20. Status: **Deployed with Known Limitations**. The goal remain
 | Private files and folders | Implemented | PDF/XLSX byte-for-byte hosted roundtrip; anonymous/outsider denial pass |
 | Reports, A4 PDF and Cyrillic | Implemented | Real four-page PDF from Pages rendered and inspected |
 | Selective publications and opportunities | Implemented | Anonymous safe snapshot, teacher opportunity, student application and acceptance pass |
-| Admin search and role grants | Implemented, applied | PostgreSQL last-admin/permission tests and hosted non-admin denial pass; first owner bootstrap pending |
+| Admin search and role grants | Implemented, applied | PostgreSQL last-admin/permission tests and hosted non-admin denial pass; owner bootstrap, hosted admin search and actual role RPC verified in Chrome |
 | Responsive UI | Implemented | Seven widths, public screens and eight authenticated routes pass; screenshots inspected |
 | Read lifetimes and search | Implemented | Genuine request cancellation and save-after-navigation test passes on Pages; project/library/global search is debounced |
 | GitHub Actions / Pages | Live | Source 37e284e, successful CI/deployment, public assets HTTP 200 |
@@ -38,7 +38,9 @@ Updated 2026-11-20. Status: **Deployed with Known Limitations**. The goal remain
 ## Owner-approved authentication change
 The owner chose immediate email/password registration without email confirmation: “Да, регистрация сразу без письма”. Confirm email is disabled. Email ownership is unverified. Email recovery is unavailable until SMTP is configured; the UI explains this. Signed-in password changes remain supported. This supersedes the initial email verification/recovery requirements.
 
-## Cleanup and remaining handoff
-Test projects, opportunities, publications, private files and avatars have been cleared and verified absent for the dedicated QA identity. Twelve exact disposable Auth identities remain. Guarded SQL is prepared in ignored .tools/; deletion awaits owner permission. No real user's account is selected.
+## Completed owner handoff and cleanup
+The owner signed into their own application account. After explicit confirmation, that exact account was assigned administrator. The real Settings screen shows the role; authenticated admin search and a successful idempotent role grant were verified through the published UI. No owner email or personal record is committed.
 
-The owner has been asked to register their own app account and confirm its email for first-administrator bootstrap. This requires no password disclosure. The active goal is not marked complete while these handoffs remain.
+After explicit permission, all twelve exact disposable QA Auth identities were deleted using the guarded UUID list and test-email checks. SQL returned zero QA identities and confirmed the owner account remains. All three former fixture logins are denied. QA projects, opportunities, publications, files and avatars are cleared, and local generated credential files are removed.
+
+No required owner actions remain. Agreed email limitations and supported data limits are documented in RELEASE_REPORT.md. The original specification remains unchanged.
