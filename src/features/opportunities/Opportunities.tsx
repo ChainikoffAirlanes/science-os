@@ -1,3 +1,4 @@
+import { read } from "../../lib/api";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -10,7 +11,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../../hooks/useAuth";
-import { list, one, insert, rpc, update, errorMessage } from "../../lib/api";
+import { insert, rpc, update, errorMessage } from "../../lib/api";
 import { categories, date } from "../../lib/validation";
 import type { Application, Opportunity, Profile } from "../../types";
 import {
@@ -74,7 +75,7 @@ export function Opportunities() {
     [subject, setSubject] = useState(""),
     q = useQuery({
       queryKey: ["opportunities"],
-      queryFn: () => list<Opportunity>("opportunities"),
+      queryFn: ({ signal }) => read(signal).list<Opportunity>("opportunities"),
     }),
     client = useQueryClient();
   const items =
@@ -211,23 +212,29 @@ export function OpportunityDetail() {
     client = useQueryClient(),
     q = useQuery({
       queryKey: ["opportunity", id],
-      queryFn: () => one<Opportunity>("opportunities", id),
+      queryFn: ({ signal }) =>
+        read(signal).one<Opportunity>("opportunities", id),
     }),
     apps = useQuery({
       queryKey: ["applications", id],
-      queryFn: () =>
-        list<Application>("opportunity_applications", { opportunity_id: id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<Application>("opportunity_applications", {
+          opportunity_id: id,
+        }),
     }),
     teacher = useQuery({
       queryKey: ["teacher", q.data?.teacher_id],
-      queryFn: () => one<Profile>("profiles", q.data!.teacher_id),
+      queryFn: ({ signal }) =>
+        read(signal).one<Profile>("profiles", q.data!.teacher_id),
       enabled: !!q.data,
     }),
     students = useQuery({
       queryKey: ["applicants", id, apps.data?.length],
-      queryFn: () =>
+      queryFn: ({ signal }) =>
         Promise.all(
-          (apps.data ?? []).map((a) => one<Profile>("profiles", a.student_id)),
+          (apps.data ?? []).map((a) =>
+            read(signal).one<Profile>("profiles", a.student_id),
+          ),
         ),
       enabled: !!apps.data && q.data?.teacher_id === session?.user.id,
     });

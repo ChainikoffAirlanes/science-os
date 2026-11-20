@@ -1,18 +1,20 @@
+import { read } from "../lib/api";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { one, rpc } from "../lib/api";
+
 import { db } from "../lib/supabase";
 import { useAuth } from "./useAuth";
 import type { Project, Role } from "../types";
 export function useProject(id: string) {
   const project = useQuery({
     queryKey: ["project", id],
-    queryFn: () => one<Project>("projects", id),
+    queryFn: ({ signal }) => read(signal).one<Project>("projects", id),
     enabled: !!id,
   });
   const role = useQuery({
     queryKey: ["project-role", id],
-    queryFn: () => rpc<Role>("project_role", { pid: id }),
+    queryFn: ({ signal }) =>
+      read(signal).rpc<Role>("project_role", { pid: id }),
     enabled: !!project.data,
   });
   return { ...project, role: role.data };

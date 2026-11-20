@@ -1,3 +1,5 @@
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
+import { read } from "../lib/api";
 import { useState } from "react";
 import {
   NavLink,
@@ -33,7 +35,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { db } from "../lib/supabase";
-import { list } from "../lib/api";
+
 import type { Notification, Project } from "../types";
 import { Avatar, Button, Modal, Empty } from "./ui";
 const nav = [
@@ -61,15 +63,18 @@ export default function Layout() {
     { profile, role, session } = useAuth();
   const notifications = useQuery({
     queryKey: ["notifications", session?.user.id],
-    queryFn: () =>
-      list<Notification>("notifications", { recipient_id: session!.user.id }),
+    queryFn: ({ signal }) =>
+      read(signal).list<Notification>("notifications", {
+        recipient_id: session!.user.id,
+      }),
     enabled: !!session,
     refetchInterval: 30000,
   });
   const projects = useQuery({
     queryKey: ["projects"],
-    queryFn: () => list<Project>("projects"),
+    queryFn: ({ signal }) => read(signal).list<Project>("projects"),
   });
+  const debouncedSearch = useDebouncedValue(term);
   const unread = notifications.data?.filter((n) => !n.read_at).length ?? 0,
     current = nav.find((n) => location.pathname.startsWith(n.to)),
     name = profile?.display_name || "Исследователь",
@@ -261,7 +266,9 @@ export default function Layout() {
         />
         <div className="search-results">
           {projects.data
-            ?.filter((p) => p.title.toLowerCase().includes(term.toLowerCase()))
+            ?.filter((p) =>
+              p.title.toLowerCase().includes(debouncedSearch.toLowerCase()),
+            )
             .map((p) => (
               <Link
                 key={p.id}

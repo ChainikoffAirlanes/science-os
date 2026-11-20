@@ -1,10 +1,11 @@
+import { read } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Download, Eye, Printer, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { useWorkspace } from "../projects/Workspace";
 import { chartPNG, ResearchChart } from "../analytics/Analytics";
-import { dataset, list, one, errorMessage, insert } from "../../lib/api";
+import { errorMessage, insert } from "../../lib/api";
 import {
   canEdit,
   date,
@@ -49,17 +50,23 @@ export default function Report() {
     charts = useRef<HTMLDivElement>(null);
   const q = useQuery({
     queryKey: ["report-data", project.id],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const [experiments, members, saved] = await Promise.all([
-        list<Experiment>("experiments", { project_id: project.id }),
-        list<Member>("project_members", { project_id: project.id }),
-        list<SavedChart>("saved_charts", { project_id: project.id }),
+        read(signal).list<Experiment>("experiments", {
+          project_id: project.id,
+        }),
+        read(signal).list<Member>("project_members", {
+          project_id: project.id,
+        }),
+        read(signal).list<SavedChart>("saved_charts", {
+          project_id: project.id,
+        }),
       ]);
       const [datasets, authors] = await Promise.all([
-        Promise.all(experiments.map(dataset)),
+        Promise.all(experiments.map(read(signal).dataset)),
         Promise.all(
           [project.owner_id, ...members.map((m) => m.user_id)].map((id) =>
-            one<Profile>("profiles", id),
+            read(signal).one<Profile>("profiles", id),
           ),
         ),
       ]);

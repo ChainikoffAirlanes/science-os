@@ -1,3 +1,4 @@
+import { read } from "../../lib/api";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,7 +16,7 @@ import {
 import { toast } from "sonner";
 import { useWorkspace } from "../projects/Workspace";
 import { db, appUrl } from "../../lib/supabase";
-import { list, insert, remove, update, errorMessage } from "../../lib/api";
+import { insert, remove, update, errorMessage } from "../../lib/api";
 import { canEdit, date, validateFile } from "../../lib/validation";
 import { download } from "../../lib/data-files";
 import type { Folder, ProjectFile } from "../../types";
@@ -44,13 +45,17 @@ export default function Files() {
   const openedLink = useRef<string | null>(null);
   const files = useQuery({
       queryKey: ["files", project.id],
-      queryFn: () =>
-        list<ProjectFile>("project_files", { project_id: project.id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<ProjectFile>("project_files", {
+          project_id: project.id,
+        }),
     }),
     folders = useQuery({
       queryKey: ["folders", project.id],
-      queryFn: () =>
-        list<Folder>("project_folders", { project_id: project.id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<Folder>("project_folders", {
+          project_id: project.id,
+        }),
     });
   useEffect(() => {
     const id = params.get("file");

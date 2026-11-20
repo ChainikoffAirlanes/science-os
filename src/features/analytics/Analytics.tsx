@@ -1,3 +1,4 @@
+import { read } from "../../lib/api";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -17,7 +18,7 @@ import {
 import { Download, Save, ChartNoAxesCombined } from "lucide-react";
 import { toast } from "sonner";
 import { useWorkspace } from "../projects/Workspace";
-import { dataset, list, insert, errorMessage } from "../../lib/api";
+import { insert, errorMessage } from "../../lib/api";
 import { canEdit } from "../../lib/validation";
 import { chartData, compatibleUnits, statistics } from "../../lib/statistics";
 import { download } from "../../lib/data-files";
@@ -268,17 +269,21 @@ export default function Analytics() {
   const { project, role } = useWorkspace(),
     q = useQuery({
       queryKey: ["analytics", project.id],
-      queryFn: async () =>
+      queryFn: async ({ signal }) =>
         Promise.all(
           (
-            await list<Experiment>("experiments", { project_id: project.id })
-          ).map(dataset),
+            await read(signal).list<Experiment>("experiments", {
+              project_id: project.id,
+            })
+          ).map(read(signal).dataset),
         ),
     }),
     saved = useQuery({
       queryKey: ["charts", project.id],
-      queryFn: () =>
-        list<SavedChart>("saved_charts", { project_id: project.id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<SavedChart>("saved_charts", {
+          project_id: project.id,
+        }),
     }),
     [draft, setDraft] = useState<ChartConfig>({
       experimentIds: [],

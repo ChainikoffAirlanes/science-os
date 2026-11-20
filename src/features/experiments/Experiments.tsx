@@ -1,10 +1,11 @@
+import { read } from "../../lib/api";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FlaskConical, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useWorkspace } from "../projects/Workspace";
-import { list, one, insert, remove, update } from "../../lib/api";
+import { insert, remove, update } from "../../lib/api";
 import { db } from "../../lib/supabase";
 import { canEdit, date } from "../../lib/validation";
 import type { Experiment, Member, Profile } from "../../types";
@@ -28,18 +29,20 @@ export function Experiments() {
     client = useQueryClient();
   const q = useQuery({
       queryKey: ["experiments", p.id],
-      queryFn: () => list<Experiment>("experiments", { project_id: p.id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<Experiment>("experiments", { project_id: p.id }),
     }),
     members = useQuery({
       queryKey: ["members", p.id],
-      queryFn: () => list<Member>("project_members", { project_id: p.id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<Member>("project_members", { project_id: p.id }),
     }),
     profiles = useQuery({
       queryKey: ["team-profiles", p.id, members.data?.length],
-      queryFn: () =>
+      queryFn: ({ signal }) =>
         Promise.all(
           [p.owner_id, ...(members.data ?? []).map((m) => m.user_id)].map(
-            (id) => one<Profile>("profiles", id),
+            (id) => read(signal).one<Profile>("profiles", id),
           ),
         ),
       enabled: !!members.data,
@@ -214,15 +217,17 @@ function ExperimentCard({
 }) {
   const counts = useQuery({
     queryKey: ["experiment-counts", e.project_id, e.id],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const [rows, parameters] = await Promise.all([
         db()
           .from("experiment_rows")
           .select("id", { count: "exact", head: true })
+          .abortSignal(signal)
           .eq("experiment_id", e.id),
         db()
           .from("experiment_parameters")
           .select("id", { count: "exact", head: true })
+          .abortSignal(signal)
           .eq("experiment_id", e.id),
       ]);
       if (rows.error || parameters.error) throw rows.error ?? parameters.error;

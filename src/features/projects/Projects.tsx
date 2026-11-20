@@ -1,3 +1,5 @@
+import { useDebouncedValue } from "../../hooks/useDebouncedValue";
+import { read } from "../../lib/api";
 import { db } from "../../lib/supabase";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -19,7 +21,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { toast } from "sonner";
-import { list, insert, errorMessage, remove, update, rpc } from "../../lib/api";
+import { insert, errorMessage, remove, update, rpc } from "../../lib/api";
 import { useAuth } from "../../hooks/useAuth";
 import {
   categories,
@@ -58,10 +60,11 @@ export function ProjectCard({
   ].slice(0, 4);
   const people = useQuery({
     queryKey: ["card-profiles", p.id, memberIds.join(",")],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const { data, error } = await db()
         .from("profiles")
         .select("id,display_name,avatar_path")
+        .abortSignal(signal)
         .in("id", memberIds);
       if (error) throw error;
       return data as Pick<Profile, "id" | "display_name" | "avatar_path">[];
@@ -134,19 +137,19 @@ export function Dashboard() {
   const { profile, session } = useAuth(),
     q = useQuery({
       queryKey: ["projects"],
-      queryFn: () => list<Project>("projects"),
+      queryFn: ({ signal }) => read(signal).list<Project>("projects"),
     }),
     tasks = useQuery({
       queryKey: ["all-tasks"],
-      queryFn: () => list<Task>("tasks"),
+      queryFn: ({ signal }) => read(signal).list<Task>("tasks"),
     }),
     experiments = useQuery({
       queryKey: ["all-experiments"],
-      queryFn: () => list<Experiment>("experiments"),
+      queryFn: ({ signal }) => read(signal).list<Experiment>("experiments"),
     }),
     members = useQuery({
       queryKey: ["all-members"],
-      queryFn: () => list<Member>("project_members"),
+      queryFn: ({ signal }) => read(signal).list<Member>("project_members"),
     });
   if (q.isLoading) return <Skeleton />;
   if (q.error)
@@ -306,15 +309,15 @@ export function Projects() {
     [copying, setCopying] = useState(false);
   const q = useQuery({
       queryKey: ["projects"],
-      queryFn: () => list<Project>("projects"),
+      queryFn: ({ signal }) => read(signal).list<Project>("projects"),
     }),
     experiments = useQuery({
       queryKey: ["all-experiments"],
-      queryFn: () => list<Experiment>("experiments"),
+      queryFn: ({ signal }) => read(signal).list<Experiment>("experiments"),
     }),
     members = useQuery({
       queryKey: ["all-members"],
-      queryFn: () => list<Member>("project_members"),
+      queryFn: ({ signal }) => read(signal).list<Member>("project_members"),
     }),
     [search, setSearch] = useState(""),
     [status, setStatus] = useState(""),
@@ -325,10 +328,11 @@ export function Projects() {
     [deleting, setDeleting] = useState(false),
     client = useQueryClient(),
     { session } = useAuth();
+  const debouncedSearch = useDebouncedValue(search);
   const projects = (q.data ?? [])
     .filter(
       (p) =>
-        p.title.toLowerCase().includes(search.toLowerCase()) &&
+        p.title.toLowerCase().includes(debouncedSearch.toLowerCase()) &&
         (!status || p.status === status) &&
         (!category || p.science_category === category),
     )

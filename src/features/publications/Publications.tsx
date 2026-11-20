@@ -1,8 +1,10 @@
+import { useDebouncedValue } from "../../hooks/useDebouncedValue";
+import { read } from "../../lib/api";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Search, ArrowUpRight } from "lucide-react";
-import { list, one, remove } from "../../lib/api";
+import { remove } from "../../lib/api";
 import { configured } from "../../lib/supabase";
 import {
   categories,
@@ -30,15 +32,17 @@ export function Publications() {
     [author, setAuthor] = useState(""),
     q = useQuery({
       queryKey: ["publications"],
-      queryFn: () => list<Publication>("publications", {}, "published_at"),
+      queryFn: ({ signal }) =>
+        read(signal).list<Publication>("publications", {}, "published_at"),
       enabled: configured,
     });
+  const debouncedSearch = useDebouncedValue(search);
   const items =
     q.data?.filter(
       (p) =>
         (p.title + " " + p.abstract)
           .toLowerCase()
-          .includes(search.toLowerCase()) &&
+          .includes(debouncedSearch.toLowerCase()) &&
         (!category || p.public_content.category === category) &&
         (!researchType || p.public_content.research_type === researchType) &&
         (!from || p.published_at >= from) &&
@@ -156,7 +160,8 @@ export function PublicationDetail() {
   const { id = "" } = useParams(),
     q = useQuery({
       queryKey: ["publication", id],
-      queryFn: () => one<Publication>("publications", id),
+      queryFn: ({ signal }) =>
+        read(signal).one<Publication>("publications", id),
       enabled: configured,
     }),
     [deleting, setDeleting] = useState(false),

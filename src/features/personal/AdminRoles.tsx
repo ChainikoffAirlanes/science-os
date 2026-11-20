@@ -1,3 +1,4 @@
+import { read } from "../../lib/api";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -31,7 +32,8 @@ export default function AdminRoles() {
     { refresh } = useAuth();
   const q = useQuery({
     queryKey: ["admin-users", search],
-    queryFn: () => rpc<UserRole[]>("admin_search_users", { search }),
+    queryFn: ({ signal }) =>
+      read(signal).rpc<UserRole[]>("admin_search_users", { search }),
     enabled: search.length >= 2,
   });
   return (

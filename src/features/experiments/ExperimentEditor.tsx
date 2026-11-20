@@ -1,3 +1,4 @@
+import { read } from "../../lib/api";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useBlocker, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -422,11 +423,11 @@ export default function ExperimentEditor() {
     [addBusy, setAddBusy] = useState(false);
   const q = useQuery({
     queryKey: ["dataset", project.id, experimentId],
-    queryFn: async () => {
-      const e = await one<Experiment>("experiments", experimentId);
+    queryFn: async ({ signal }) => {
+      const e = await read(signal).one<Experiment>("experiments", experimentId);
       if (e.project_id !== project.id)
         throw new Error("Эксперимент не принадлежит проекту");
-      return dataset(e);
+      return read(signal).dataset(e);
     },
   });
   const editable = canEdit(role),
@@ -861,6 +862,10 @@ export default function ExperimentEditor() {
                 "с",
                 "мин",
                 "°C",
+                "K",
+                "ч",
+                "Ом",
+                "безразм.",
                 "%",
                 "В",
                 "А",

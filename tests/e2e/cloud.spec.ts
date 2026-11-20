@@ -965,17 +965,34 @@ test.describe.serial("Live Supabase research lifecycle", () => {
     test(`Responsive research workspace ${width}px`, async ({ page }, info) => {
       await login(page, "owner");
       await page.setViewportSize({ width, height: 1000 });
-      for (const [route, name] of [
-        ["/dashboard", "dashboard"],
-        ["/projects", "projects"],
-        [`/projects/${pid}/experiments/${eid}`, "editor"],
-        [`/projects/${pid}/analytics`, "analytics"],
-        [`/projects/${pid}/files`, "files"],
-        [`/projects/${pid}/team`, "team"],
-        [`/projects/${pid}/tasks`, "tasks"],
-        [`/projects/${pid}/report`, "report"],
+      for (const [route, name, heading] of [
+        ["/dashboard", "dashboard", "Добро пожаловать, QA"],
+        ["/projects", "projects", "Мои проекты"],
+        [`/projects/${pid}/experiments/${eid}`, "editor", "Остывание воды"],
+        [`/projects/${pid}/analytics`, "analytics", "Аналитика исследования"],
+        [`/projects/${pid}/files`, "files", "Файлы проекта"],
+        [`/projects/${pid}/team`, "team", "Команда проекта"],
+        [`/projects/${pid}/tasks`, "tasks", "Задачи исследования"],
+        [`/projects/${pid}/report`, "report", "Научный отчёт"],
       ]) {
         await page.goto("#" + route);
+        await expect(
+          page.getByRole("heading", { name: heading, exact: true }),
+        ).toBeVisible();
+        if (name === "team")
+          await expect(
+            page
+              .locator(".standard-table")
+              .getByText("QA owner", { exact: true }),
+          ).toBeVisible();
+        if (name === "editor")
+          await expect(
+            page.getByRole("textbox", { name: /Время, наблюдение/ }).first(),
+          ).toBeVisible();
+        if (name === "dashboard" || name === "projects")
+          await expect(
+            page.locator(".avatar-group .avatar").first(),
+          ).toBeVisible();
         await expect(page.locator(".loading")).toHaveCount(0);
         await expect(page.locator(".skeleton-grid")).toHaveCount(0);
         await page.evaluate(() => document.fonts.ready);

@@ -1,9 +1,10 @@
+import { read } from "../../lib/api";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Copy, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { useWorkspace } from "../projects/Workspace";
-import { list, one, rpc, errorMessage } from "../../lib/api";
+import { rpc, errorMessage } from "../../lib/api";
 import { date } from "../../lib/validation";
 import { appUrl } from "../../lib/supabase";
 import type { Invite, Member, Profile } from "../../types";
@@ -28,23 +29,27 @@ export default function Team() {
     [busy, setBusy] = useState("");
   const q = useQuery({
       queryKey: ["members", project.id],
-      queryFn: () =>
-        list<Member>("project_members", { project_id: project.id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<Member>("project_members", {
+          project_id: project.id,
+        }),
     }),
     profiles = useQuery({
       queryKey: ["team-profiles", project.id, q.data?.length],
-      queryFn: async () =>
+      queryFn: async ({ signal }) =>
         Promise.all(
           [project.owner_id, ...(q.data ?? []).map((m) => m.user_id)].map(
-            (id) => one<Profile>("profiles", id),
+            (id) => read(signal).one<Profile>("profiles", id),
           ),
         ),
       enabled: !!q.data,
     }),
     invites = useQuery({
       queryKey: ["invites", project.id],
-      queryFn: () =>
-        list<Invite>("project_invites", { project_id: project.id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<Invite>("project_invites", {
+          project_id: project.id,
+        }),
       enabled: role === "owner",
     });
   const members = [

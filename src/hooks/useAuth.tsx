@@ -1,9 +1,10 @@
+import { read } from "../lib/api";
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
-import { one, list } from "../lib/api";
+
 import type { Profile } from "../types";
 interface AuthState {
   session: Session | null;
@@ -52,13 +53,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [client]);
   const profile = useQuery({
     queryKey: ["profile", session?.user.id],
-    queryFn: () => one<Profile>("profiles", session!.user.id),
+    queryFn: ({ signal }) =>
+      read(signal).one<Profile>("profiles", session!.user.id),
     enabled: !!session,
   });
   const roles = useQuery({
     queryKey: ["role", session?.user.id],
-    queryFn: () =>
-      list<{ role: string }>("user_roles", { user_id: session!.user.id }),
+    queryFn: ({ signal }) =>
+      read(signal).list<{ role: string }>("user_roles", {
+        user_id: session!.user.id,
+      }),
     enabled: !!session,
   });
   return (

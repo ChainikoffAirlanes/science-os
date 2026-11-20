@@ -3809,4 +3809,8 @@ summary::-webkit-details-marker {
   overflow-wrap: anywhere;
 }
 
-.avatar-group{display:flex;gap:3px;margin-top:12px;}
+.avatar-group {
+  display: flex;
+  gap: 3px;
+  margin-top: 12px;
+}

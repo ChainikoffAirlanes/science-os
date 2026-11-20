@@ -1,3 +1,4 @@
+import { read } from "../../lib/api";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -9,14 +10,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useWorkspace } from "../projects/Workspace";
-import {
-  list,
-  one,
-  insert,
-  update,
-  errorMessage,
-  ConflictError,
-} from "../../lib/api";
+import { insert, update, errorMessage, ConflictError } from "../../lib/api";
 import { canEdit, date, statuses } from "../../lib/validation";
 import type { Activity, Comment, Member, Profile, Task } from "../../types";
 import {
@@ -39,26 +33,29 @@ export default function Tasks() {
     client = useQueryClient();
   const q = useQuery({
       queryKey: ["tasks", project.id],
-      queryFn: () => list<Task>("tasks", { project_id: project.id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<Task>("tasks", { project_id: project.id }),
     }),
     members = useQuery({
       queryKey: ["members", project.id],
-      queryFn: () =>
-        list<Member>("project_members", { project_id: project.id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<Member>("project_members", {
+          project_id: project.id,
+        }),
     }),
     counts = useQuery({
       queryKey: ["comments", project.id, "counts"],
-      queryFn: () =>
-        list<Pick<Comment, "task_id">>("task_comments", {
+      queryFn: ({ signal }) =>
+        read(signal).list<Pick<Comment, "task_id">>("task_comments", {
           project_id: project.id,
         }),
     }),
     profiles = useQuery({
       queryKey: ["team-profiles", project.id, members.data?.length],
-      queryFn: async () =>
+      queryFn: async ({ signal }) =>
         Promise.all(
           [project.owner_id, ...(members.data ?? []).map((m) => m.user_id)].map(
-            (id) => one<Profile>("profiles", id),
+            (id) => read(signal).one<Profile>("profiles", id),
           ),
         ),
       enabled: !!members.data,
@@ -248,12 +245,13 @@ function TaskDetails({
     [busy, setBusy] = useState(false);
   const comments = useQuery({
       queryKey: ["comments", task.project_id, task.id],
-      queryFn: () => list<Comment>("task_comments", { task_id: task.id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<Comment>("task_comments", { task_id: task.id }),
     }),
     history = useQuery({
       queryKey: ["task-history", task.project_id, task.id],
-      queryFn: () =>
-        list<Activity>("activity_log", {
+      queryFn: ({ signal }) =>
+        read(signal).list<Activity>("activity_log", {
           entity_id: task.id,
           project_id: task.project_id,
         }),

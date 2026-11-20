@@ -1,3 +1,4 @@
+import { read } from "../../lib/api";
 import AdminRoles from "./AdminRoles";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -13,7 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { db } from "../../lib/supabase";
-import { list, rpc, errorMessage } from "../../lib/api";
+import { rpc, errorMessage } from "../../lib/api";
 import { useAuth } from "../../hooks/useAuth";
 import { date } from "../../lib/validation";
 import {
@@ -31,8 +32,10 @@ export function Notifications() {
   const { session } = useAuth(),
     q = useQuery({
       queryKey: ["notifications", session?.user.id],
-      queryFn: () =>
-        list<Notification>("notifications", { recipient_id: session!.user.id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<Notification>("notifications", {
+          recipient_id: session!.user.id,
+        }),
     }),
     client = useQueryClient(),
     [busy, setBusy] = useState(false);

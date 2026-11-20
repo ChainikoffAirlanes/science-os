@@ -1,3 +1,4 @@
+import { read } from "../../lib/api";
 import { useEffect, useState } from "react";
 import {
   Link,
@@ -12,13 +13,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { UsersRound, Share2, Pencil, MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { useProject, useRealtime } from "../../hooks/useProject";
-import {
-  list,
-  update,
-  remove,
-  ConflictError,
-  errorMessage,
-} from "../../lib/api";
+import { update, remove, ConflictError, errorMessage } from "../../lib/api";
 import {
   canEdit,
   date,
@@ -290,20 +285,28 @@ export function Overview() {
     client = useQueryClient();
   const activity = useQuery({
       queryKey: ["activity", p.id],
-      queryFn: () =>
-        list<Activity>("activity_log", { project_id: p.id }, "created_at", 15),
+      queryFn: ({ signal }) =>
+        read(signal).list<Activity>(
+          "activity_log",
+          { project_id: p.id },
+          "created_at",
+          15,
+        ),
     }),
     members = useQuery({
       queryKey: ["members", p.id],
-      queryFn: () => list<Member>("project_members", { project_id: p.id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<Member>("project_members", { project_id: p.id }),
     }),
     experiments = useQuery({
       queryKey: ["experiments", p.id],
-      queryFn: () => list<Experiment>("experiments", { project_id: p.id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<Experiment>("experiments", { project_id: p.id }),
     }),
     tasks = useQuery({
       queryKey: ["tasks", p.id],
-      queryFn: () => list<Task>("tasks", { project_id: p.id }),
+      queryFn: ({ signal }) =>
+        read(signal).list<Task>("tasks", { project_id: p.id }),
     });
   return (
     <div className="overview-grid">
